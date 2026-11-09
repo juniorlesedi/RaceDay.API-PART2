@@ -1,0 +1,150 @@
+﻿@model List<RaceDay.MVC.Models.RegistrationViewModel>
+@using RaceDay.MVC.Models
+
+@{
+    ViewData["Title"] = "Event Enrolments";
+
+    var events = ViewBag.Events as List<RaceEventViewModel>
+        ?? new List<RaceEventViewModel>();
+
+    int? selectedEventId = ViewBag.SelectedEventId;
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-3">Event Enrolments</h2>
+
+    <p class="text-muted">
+        Select an event to view registered participants.
+    </p>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <form method="get" asp-action="Index" class="mb-4">
+
+        <label class="form-label">Select Event</label>
+
+        <select name="eventId"
+                class="form-select"
+                required>
+
+            <option value="">-- Select Event --</option>
+
+            @foreach (var raceEvent in events)
+            {
+                if (selectedEventId == raceEvent.eventID)
+                {
+                    <option value="@raceEvent.eventID" selected>
+                        @raceEvent.name
+                    </option>
+                }
+                else
+                {
+                    <option value="@raceEvent.eventID">
+                        @raceEvent.name
+                    </option>
+                }
+            }
+
+        </select>
+
+        <button type="submit"
+                class="btn btn-primary mt-3">
+            View Enrolments
+        </button>
+
+    </form>
+
+    @if (selectedEventId.HasValue)
+    {
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <h4>
+                    Total Enrolments: @Model.Count
+                </h4>
+
+                @if (!Model.Any())
+                {
+                    <div class="alert alert-info">
+                        No participants have enrolled for this event.
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+
+                        <table class="table table-striped">
+
+                            <thead>
+                                <tr>
+                                    <th>Registration ID</th>
+                                    <th>Participant ID</th>
+                                    <th>Category ID</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Payment</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.registrationID</td>
+                                        <td>@item.participantID</td>
+                                        <td>@item.categoryID</td>
+                                        <td>
+                                            @item.registrationdate.ToString("dd MMM yyyy")
+                                        </td>
+                                        <td>
+                                            @if (item.status == "Registered" ||
+                                                                            item.status == "Confirmed")
+                                            {
+                                                <span class="badge bg-success">
+                                                    @item.status
+                                                </span>
+                                            }
+                                            else if (item.status == "Cancelled")
+                                            {
+                                                <span class="badge bg-danger">
+                                                    @item.status
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning text-dark">
+                                                    @item.status
+                                                </span>
+                                            }
+                                        </td>
+                                        <td>@item.paymentstatus</td>
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    }
+
+    <a asp-controller="Organiser"
+       asp-action="Index"
+       class="btn btn-outline-secondary mt-3">
+        Back to Dashboard
+    </a>
+
+</div>

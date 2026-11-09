@@ -1,0 +1,91 @@
+﻿@{
+    ViewData["Title"] = "Organiser Dashboard";
+}
+
+<div class="container mt-5">
+
+    <h2 class="text-primary mb-3">Organiser Dashboard</h2>
+
+    <p class="lead">
+        Welcome, @ViewBag.UserName!
+    </p>
+
+    <p class="text-muted">
+        Manage your RaceDay events, categories,
+        registrations and results.
+    </p>
+
+    <hr />
+
+    <div class="row g-4 mt-3">
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h4>Events</h4>
+                    <p>Create, view, edit and delete race events.</p>
+
+                    <a asp-controller="Events"
+                       asp-action="Index"
+                       class="btn btn-primary">
+                        Manage Events
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h4>Categories</h4>
+                    <p>Create and manage race categories.</p>
+
+                    <a asp-controller="Categories"
+                       asp-action="Index"
+                       class="btn btn-primary">
+                        Manage Categories
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h4>Registrations</h4>
+                    <p>View participants registered for events.</p>
+
+                    <span class="badge bg-secondary">
+
+                        <a asp-controller="Registrations"
+                           asp-action="Index"
+                           class="btn btn-primary">
+                            View Enrolments
+                        </a>
+
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h4>Results</h4>
+                    <p>Capture and manage race results.</p>
+
+                    <span class="badge bg-secondary">
+
+                        <a asp-controller="Results"
+                           asp-action="Index"
+                           class="btn btn-primary">
+                            Manage Results
+                        </a>
+
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

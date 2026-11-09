@@ -1,0 +1,208 @@
+﻿@model List<RaceDay.MVC.Models.ResultViewModel>
+@using RaceDay.MVC.Models
+
+@{
+    ViewData["Title"] = "Race Results";
+
+    var events = ViewBag.Events as List<RaceEventViewModel>
+        ?? new List<RaceEventViewModel>();
+
+    var registrations =
+        ViewBag.Registrations as List<RegistrationViewModel>
+        ?? new List<RegistrationViewModel>();
+
+    int? selectedEventId = ViewBag.SelectedEventId;
+
+    var recordedIds = Model
+        .Select(r => r.registrationID)
+        .ToHashSet();
+}
+
+<div class="container mt-4">
+
+    <h2>Race Results</h2>
+
+    <p class="text-muted">
+        Record finish times and finishing positions
+        for enrolled participants.
+    </p>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <form method="get" asp-action="Index"
+          class="card card-body mb-4">
+
+        <label class="form-label">Select Event</label>
+
+        <select name="eventId"
+                class="form-select"
+                required>
+            <option value="">-- Select Event --</option>
+
+            @foreach (var raceEvent in events)
+            {
+                if (selectedEventId == raceEvent.eventID)
+                {
+                    <option value="@raceEvent.eventID" selected>
+                        @raceEvent.name
+                    </option>
+                }
+                else
+                {
+                    <option value="@raceEvent.eventID">
+                        @raceEvent.name
+                    </option>
+                }
+            }
+        </select>
+
+        <button class="btn btn-primary mt-3"
+                type="submit">
+            View Results
+        </button>
+    </form>
+
+    @if (selectedEventId.HasValue)
+    {
+        <h4>Record a Finish Time</h4>
+
+        @if (!registrations.Any())
+        {
+            <div class="alert alert-info">
+                No enrolments found for this event.
+            </div>
+        }
+        else
+        {
+            <div class="card card-body mb-4">
+                <form asp-controller="Results"
+                      asp-action="Create"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="eventId"
+                           value="@selectedEventId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Participant Registration
+                        </label>
+
+                        <select name="RegistrationId"
+                                class="form-select"
+                                required>
+                            <option value="">
+                                -- Select Registration --
+                            </option>
+
+                            @foreach (var reg in registrations
+                                                .Where(r => r.status != "Cancelled"
+                                                && !recordedIds.Contains(r.registrationID)))
+                            {
+                                <option value="@reg.registrationID">
+                                    Registration #@reg.registrationID
+                                    - Participant #@reg.participantID
+                                    - Category #@reg.categoryID
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Finish Time (HH:mm:ss)
+                        </label>
+
+                        <input type="text"
+                               name="FinishTime"
+                               class="form-control"
+                               placeholder="01:25:30"
+                               pattern="[0-9]{1,2}:[0-5][0-9]:[0-5][0-9]"
+                               title="Enter hours:minutes:seconds"
+                               required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">
+                            Finishing Position
+                        </label>
+
+                        <input type="number"
+                               name="Position"
+                               class="form-control"
+                               min="1"
+                               required />
+                    </div>
+
+                    <input type="hidden"
+                           name="SplitTimes"
+                           value="" />
+
+                    <button type="submit"
+                            class="btn btn-success">
+                        Save Result
+                    </button>
+                </form>
+            </div>
+        }
+
+        <h4>Recorded Results (@Model.Count)</h4>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Participant</th>
+                        <th>Category</th>
+                        <th>Finish Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var result in Model.OrderBy(r => r.position))
+                    {
+                        <tr>
+                            <td>
+                                <span class="badge bg-success">
+                                    #@result.position
+                                </span>
+                            </td>
+                            <td>@result.participantID</td>
+                            <td>@result.categoryID</td>
+                            <td>
+                                @result.finish_time.ToString(@"hh\:mm\:ss")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <a asp-controller="Organiser"
+       asp-action="Index"
+       class="btn btn-outline-secondary mt-3">
+        Back to Dashboard
+    </a>
+</div>
