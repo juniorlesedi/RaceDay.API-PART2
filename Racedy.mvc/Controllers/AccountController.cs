@@ -15,7 +15,7 @@ namespace RaceDay.MVC.Controllers
             _apiService = apiService;
         }
 
-        // Display the login page
+        // Displaying the login page
         [HttpGet]
         public IActionResult Login()
         {
